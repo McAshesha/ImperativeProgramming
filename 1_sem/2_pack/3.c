@@ -36,7 +36,7 @@ int main(void)
     }
 
     // Calculate and print the ratios with 5 decimal places
-    printf("%.5lf %.5lf %.5lf\n",
+    printf("%.15lf %.15lf %.15lf",
            (double)count_negative / N,
            (double)count_neutral / N,
            (double)count_positive / N);

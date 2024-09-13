@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 int main(void)
-{
+{ //TODO: Нифига не работает ни Арсения ни мо
     int count_words = 0, is_word_now = 0; // Tracks the number of words and check if we are currently inside a word
 
     /* Redirect standard input to read from "input.txt" and output to "output.txt" */
@@ -34,7 +34,7 @@ int main(void)
     }
 
     // Output the total word count
-    printf("%d\n", count_words);
+    printf("%d", count_words);
 
     /* Close the file streams for input and output */
     fclose(stdin);

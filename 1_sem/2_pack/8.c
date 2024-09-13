@@ -52,7 +52,7 @@ int main(void)
         }
     }
 
-    printf("%d %d %d", D, M, Y); // Print the final date
+    printf("%d %d %d\n", D, M, Y); // Print the final date
 
 	/* Close the file streams for input and output */
     fclose(stdin);

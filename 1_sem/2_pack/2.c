@@ -46,7 +46,7 @@ int main(void)
     scanf("%3s", day); // Read up to 3 characters to avoid buffer overflow
 
     // Output the corresponding number of the day
-    printf("%d\n", get_number_day(day));
+    printf("%d", get_number_day(day));
 
     /* Close the file streams for input and output */
     fclose(stdin);

@@ -1,69 +1,44 @@
 #include <stdio.h>
 
-int main() {
+int main(void)
+{
+	int count_words = 0, is_word_now = 0; // Tracks the number of words and check if we are currently inside a word
+
+	/* Redirect standard input to read from "input.txt" and output to "output.txt" */
 	freopen("input.txt", "r", stdin);
 	freopen("output.txt", "w", stdout);
 
-	char prev = ' ', curr = ' ', strCom = 0, caseCom = 0, start = 1;
+	char symbol;
 
-	while (1)
+	// Read until end of file (or new line or null character in case of interactive input)
+	while (scanf("%c", &symbol) && symbol != '\n' && symbol != '\0' && symbol != EOF)
 	{
-		if (scanf("%c", &curr) != 1)
+		if (symbol == '.') // Word boundary characters
 		{
-			if (!(strCom || caseCom))
+			if (is_word_now) // If we were inside a word, we just reached the end of a word
 			{
-				printf("%c", prev);
-			}
-			else if (prev == '\n')
-			{
-				printf("%c", prev);
-			}
-			break;
-		}
-
-		if (start)
-		{
-			start = 0;
-			prev = curr;
-			continue;
-		}
-
-		if (prev == '/' && !(strCom || caseCom))
-		{
-			if (curr == '/')
-			{
-				strCom = 1;
-				scanf("%c", &curr);
-				prev = curr;
-				continue;
-			}
-			if (curr == '*')
-			{
-				caseCom = 1;
-				scanf("%c", &curr);
-				prev = curr;
-				continue;
+				count_words++;
+				is_word_now = 0; // Reset flag as we are no longer in a word
 			}
 		}
-
-		if (prev == '*' && curr == '/' && caseCom)
+		else if (!is_word_now) // If we're at the start of a new word
 		{
-			caseCom = 0;
-			scanf("%c", &curr);
-			prev = curr;
-			continue;
+			is_word_now = 1; // Set the flag to indicate we're inside a word
 		}
-
-		if (prev == '\n')
-		{
-			strCom = strCom ? 0 : 1;
-			printf("%c", prev);
-		} else if (!(strCom || caseCom))
-		{
-			printf("%c", prev);
-		}
-		prev = curr;
 	}
 
-	return 0;
+	// Handle the last word if the input ends without a boundary character
+	if (is_word_now)
+	{
+		count_words++;
+	}
+
+	// Output the total word count
+	printf("%d", count_words);
+
+	/* Close the file streams for input and output */
+	fclose(stdin);
+	fclose(stdout);
+
+	return 0; // Indicate successful program termination
 }

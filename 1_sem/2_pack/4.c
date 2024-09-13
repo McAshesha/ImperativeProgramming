@@ -41,7 +41,7 @@ int main(void)
     // Check if the total area of B and C exceeds the area of A
     if (b_1 * b_2 + c_1 * c_2 > a_1 * a_2)
     {
-        printf("NO\n"); // If area exceeds, they cannot fit
+        printf("NO"); // If area exceeds, they cannot fit
         return 0;
     }
 
@@ -51,11 +51,11 @@ int main(void)
         canFit(a_1, a_2, b_2, b_1, c_1, c_2) ||  // Rotate B by 90 degrees
         canFit(a_1, a_2, b_2, b_1, c_2, c_1))    // Rotate both B and C by 90 degrees
     {
-        printf("YES\n"); // They fit
+        printf("YES"); // They fit
     }
     else
     {
-        printf("NO\n"); // They don't fit
+        printf("NO"); // They don't fit
     }
 
     /* Close the file streams for input and output */

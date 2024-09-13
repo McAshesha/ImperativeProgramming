@@ -1,11 +1,10 @@
 #include <stdio.h>
-#include <math.h>
 
 // Function to check if a number is prime
 int is_prime(int number)
 {
     // Loop to check divisibility from 2 to the square root of the number
-    for (int i = 2; i <= sqrt(number); i++)
+    for (int i = 2; i * i <= number; i++)
     {
         if (number % i == 0) // If divisible by any number, it's not prime
         {

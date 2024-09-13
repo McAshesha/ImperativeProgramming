@@ -26,7 +26,7 @@ int main(void)
 	}
 
 	// Output the count of valid sequences
-	printf("%d\n", count);
+	printf("%d", count);
 
 	/* Close the file streams for input and output */
 	fclose(stdin);

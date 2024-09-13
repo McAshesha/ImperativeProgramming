@@ -1,8 +1,7 @@
 #include <stdio.h>
 
 int main(void)
-{
-
+{ //TODO: Нифига не работает, так еще и тесты не пишет
     /* Redirect standard input to read from "input.txt" and output to "output.txt" */
     freopen("input.txt", "r", stdin);
     freopen("output.txt", "w", stdout);
