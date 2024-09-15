@@ -22,6 +22,11 @@ This repo is divided into main sections for your convenience:
 │   └── lectures/
 │       ├── lecture_1.pdf
 │       ├── .../ # Additional lectures
+├── 2_sem/
+│   ├── homeworks/
+│   │   ├── .../
+│   └── lectures/
+│       ├── .../
 ├── README.md   # This README file
 ├── c_book.pdf  # C Programming Book for Reference
 ├── c_book_algorithms.pdf  # C Algorithms Book for Reference
