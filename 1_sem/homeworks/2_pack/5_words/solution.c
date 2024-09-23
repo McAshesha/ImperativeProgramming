@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 int main(void)
-{ //TODO: Нифига не работает ни Арсения ни мое
+{ //TODO: Оба решения верны (мнение лектора), но тестировщик не принимает ни одного из моих решений
     int count_words = 0, is_word_now = 0; // Tracks the number of words and check if we are currently inside a word
 
     /* Redirect standard input to read from "input.txt" and output to "output.txt" */
@@ -11,8 +11,12 @@ int main(void)
     char symbol;
 
     // Read until end of file (or new line or null character in case of interactive input)
-    while (scanf("%c", &symbol) && symbol != '\n' && symbol != '\0' && symbol != EOF)
+    while (scanf("%c", &symbol) == 1)
     {
+        if (symbol == '\n' || symbol == '\0' || symbol == EOF)
+        {
+            break;
+        }
         if (symbol == '.') // Word boundary characters
         {
             if (is_word_now) // If we were inside a word, we just reached the end of a word
@@ -33,7 +37,7 @@ int main(void)
         count_words++;
     }
 
-    /* do {
+    /* SECOND SOLUTION do {
         scanf("%c", &symbol);
         if (symbol == '.' || symbol == '\n' || symbol == EOF && symbol == '\0') // Word boundary characters
         {

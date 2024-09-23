@@ -56,6 +56,7 @@ Each folder within the `1_pack` and `2_pack` directories is organized by tasks (
 - **C Programming Book**: Check out `c_book.pdf` in the root of the repository for an in-depth guide to C programming.
 - **C Algorithms Book**: Refer to `c_book_algorithms.pdf` for algorithms in C.
 - **C Programming Tutorial**: Visit [Metanit C Tutorial](https://metanit.com/c/tutorial/) for more tutorials and explanations.
+- **Imperative Programming Navigator**: Visit [Navigator](https://sites.google.com/g.nsu.ru/m-filippov/) for more resources and information.
 
 ## 💡 Notes:
 

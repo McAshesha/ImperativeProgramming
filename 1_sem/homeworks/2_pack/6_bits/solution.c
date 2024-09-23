@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 int main(void)
-{ //TODO: Нифига не работает, так еще и тесты не пишет
+{
     /* Redirect standard input to read from "input.txt" and output to "output.txt" */
     freopen("input.txt", "r", stdin);
     freopen("output.txt", "w", stdout);
@@ -30,11 +30,7 @@ int main(void)
         }
     }
 
-    // Print the last byte if it wasn't a full set of 8 bits
-    if (i % 8 != 0)
-    {
-        printf("%d", result); // Output the remaining bits
-    }
+    printf("%d ", result);
 
     /* Close the file streams for input and output */
     fclose(stdin);
