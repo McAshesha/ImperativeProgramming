@@ -23,7 +23,7 @@ void add(int index, char* value)
     }
     else
     {
-        nodes[tail].next = (nodes + index)->next;
+        nodes[tail].next = nodes[index].next;
         nodes[index].next = tail;
     }
     sprintf(temp, "%d", tail ++);
