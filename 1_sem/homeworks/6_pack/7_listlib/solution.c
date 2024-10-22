@@ -64,7 +64,7 @@ int main()
 		List list;
 		initList(&list);
 
-		Node **nodes = (Node**) malloc((Q + 1) * sizeof(Node*));
+		Node **nodes = (Node**) malloc((Q + 1) * sizeof(Node *));
 		nodes[0] = &list;
 		int idx = 1;
 
@@ -102,10 +102,10 @@ int main()
 
 		for (Node *node = list.next; node != &list; )
 		{
-			Node *next = node->next;
-			free(node->value);
-			free(node);
-			node = next;
+		    Node *next = node->next;
+		    free(node->value);
+		    free(node);
+		    node = next;
 		}
 
 		free(nodes);
