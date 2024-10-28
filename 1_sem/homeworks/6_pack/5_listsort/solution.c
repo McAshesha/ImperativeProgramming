@@ -49,7 +49,7 @@ void add_node(int key, Node *node)
     }
 
     Node *last = array[key];
-    while (last->nextL)
+    while (last->next)
     {
         last = last->next;
     }
