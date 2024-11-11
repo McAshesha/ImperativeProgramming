@@ -15,39 +15,24 @@ int main()
     int N;
     scanf("%d", &N);
 
-    int *arr = (int *) malloc(N * sizeof(int));
-
+    int *a = (int*) malloc(N * sizeof(int));
     for (int i = 0; i < N; i++)
     {
-        scanf("%d", &arr[i]);
+        scanf("%d", &a[i]);
     }
 
-    qsort(arr, N, sizeof(int), compare);
-
-    int count = 0;
-
-    for (int i = 0; i < N; i++)
+    qsort(a, N, sizeof(int), compare);
+    long long sum_min = 0;
+    for (int i = 0; i < N - 1; i++)
     {
-        if (arr[i] != arr[i + 1])
-        {
-            count++;
-        }
+        sum_min += (long long) a[i] * (N - i - 1);
     }
 
-    printf("%d\n", count);
-
-    for (int idx = 0, i = 0; i < N; i++)
-    {
-        if (arr[i] != arr[i + 1]) {
-            printf("%d\n", arr[i]);
-        }
-    }
-
-    free(arr);
+    printf("%lld", sum_min);
+    free(a);
 
     /* Close the file streams for input and output */
     fclose(stdin);
     fclose(stdout);
-
     return 0;
 }
