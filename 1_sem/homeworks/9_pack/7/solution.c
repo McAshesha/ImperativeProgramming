@@ -38,7 +38,8 @@ int main()
 
     for (int idx = 0, i = 0; i < N; i++)
     {
-        if (arr[i] != arr[i + 1]) {
+        if (arr[i] != arr[i + 1])
+        {
             printf("%d\n", arr[i]);
         }
     }
