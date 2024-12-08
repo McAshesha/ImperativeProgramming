@@ -27,6 +27,7 @@ int main()
     /* Redirect standard input to read from "input.txt" and output to "output.txt" */
     freopen("input.txt", "r", stdin);
     freopen("output.txt", "w", stdout);
+
     int N;
     scanf("%d", &N);
 
