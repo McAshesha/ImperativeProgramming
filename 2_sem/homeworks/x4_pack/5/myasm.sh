@@ -1,0 +1,1 @@
+gcc -o myasm myasm.c -ldl

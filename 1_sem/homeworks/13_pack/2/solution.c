@@ -1,64 +1,45 @@
 #include <stdio.h>
 #include <math.h>
 
-#define PI 3.14159265358979323846
+#define PI 3.141592653589793
+#define EPSILON 1e-20
 
-double distance(double x1, double y1, double x2, double y2)
-{
-    return sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
-}
-
-double get_cos_triangle(double Ax, double Ay,
+double get_tan_triangle(double Ax, double Ay,
                         double Bx, double By,
                         double Cx, double Cy)
 {
-    double AB = distance(Ax, Ay, Bx, By);
-    double AC = distance(Ax, Ay, Cx, Cy);
-    double BC = distance(Bx, By, Cx, Cy);
-
-    double cos_angle = (AB * AB + AC * AC - BC * BC) / (2 * AB * AC);
-
-    if (cos_angle > 1.0) cos_angle = 1.0;
-    if (cos_angle < -1.0) cos_angle = -1.0;
-
-    return cos_angle;
+    return fabs((Bx - Ax) * (Cy - Ay) - (Cx - Ax) * (By - Ay))
+            / ((Bx - Ax) * (Cx - Ax) + (By - Ay) * (Cy - Ay));
 }
 
-double factorial(int n)
+double arctan(double x)
 {
-    double result = 1;
-    for (int i = 2; i <= n; i++)
+    if (x > 1.0)
     {
-        result *= i;
+        return PI / 2 - arctan(1.0 / x);
     }
-    return result;
-}
+    if (x < -1.0)
+    {
+        return -PI / 2 - arctan(1.0 / x);
+    }
+    if (fabs(x) > 0.5)
+    {
+        return 2 * arctan(x / (1.0 + sqrt(1.0 + x * x)));
+    }
 
-double arcsin(double x)
-{
-
-    double result = 0.0;
     double term = x;
-    int n = 0;
+    double sum = x;
+    double x_squared_neg = -x * x;
+    int n = 1;
 
-    for (n = 0; n < 10000; n++)
+    while (fabs(term) >= EPSILON)
     {
-        double numerator = factorial(2 * n);
-        double denominator = pow(2, 2 * n) * pow(factorial(n), 2) * (2 * n + 1);
-        term = numerator / denominator * pow(x, 2 * n + 1);
-        result += term;
-        if (term < 1e-20)
-        {
-            break;
-        }
+        term *= x_squared_neg * (2 * n - 1) / (2 * n + 1);
+        sum += term;
+        n++;
     }
 
-    return result;
-}
-
-double arccos(double x)
-{
-    return PI / 2 - asin(x);;
+    return sum < 0 ? PI + sum : sum;
 }
 
 int main()
@@ -75,8 +56,8 @@ int main()
         double Ax, Ay, Bx, By, Cx, Cy;
         scanf("%lf %lf %lf %lf %lf %lf", &Ax, &Ay, &Bx, &By, &Cx, &Cy);
 
-        double cos_angle = get_cos_triangle(Ax, Ay, Bx, By, Cx, Cy);
-        double angle_rad = arccos(cos_angle);
+        double cos_angle = get_tan_triangle(Ax, Ay, Bx, By, Cx, Cy);
+        double angle_rad = arctan(cos_angle);
         double angle_deg = angle_rad * 180.0 / PI;
 
         printf("%0.20g\n", angle_deg);
