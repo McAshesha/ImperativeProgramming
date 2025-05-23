@@ -5,9 +5,9 @@
 #define INF INT_MAX
 
 int N, K;
-int capacity[MAX_N][MAX_N]; // Пропускные способности
-int flow[MAX_N][MAX_N];     // Потоки
-int parent[MAX_N];          // Для хранения предков в пути
+int capacity[MAX_N][MAX_N];
+int flow[MAX_N][MAX_N];
+int parent[MAX_N];
 
 int findPath(int source, int sink) {
     int visited[MAX_N] = {0};
@@ -30,7 +30,7 @@ int findPath(int source, int sink) {
     return visited[sink];
 }
 
-// Поиск максимального потока методом Форда-Фалкерсона
+// Форда-Фалкерсон
 int fordFulkerson(int source, int sink) {
     int maxFlow = 0;
     while (findPath(source, sink)) {
@@ -57,8 +57,8 @@ int main() {
     for (int i = 0; i < K; i++) {
         int u, v, c;
         scanf("%d %d %d", &u, &v, &c);
-        capacity[u - 1][v - 1] = c; // Приводим к нумерации с 0
-        capacity[v - 1][u - 1] = c; // Обратное ребро
+        capacity[u - 1][v - 1] = c;
+        capacity[v - 1][u - 1] = c;
     }
 
     int maxFlow = fordFulkerson(0, N - 1);
