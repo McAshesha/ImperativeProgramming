@@ -1,121 +1,145 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include <stdbool.h>
+#include <stdint.h>
 
-// Задаём максимальные параметры: число вершин (MAXN) и число рёбер (MAXM).
-// При необходимости можно увеличить в зависимости от ограничений задачи.
-#define MAXN 10000
-#define MAXM 100000
+#define MAX_N 10
+#define MAX_K 10
+#define MAX_M 100
 
-// Структуры для представления списка смежности.
-// Мы храним два массива ребёр (двунаправленные): to[] ? назначение ребра, nxt[] ? ссылка на следующее ребро из той же вершины.
-// head[u] хранит индекс первого ребра, исходящего из вершины u.
-// ecnt ? счетчик добавленных полурёбер (т.к. каждое ребро фактически добавляется дважды для неориентированного графа).
-int head[MAXN + 1];
-int to[2 * MAXM + 1];
-int nxt[2 * MAXM + 1];
-int ecnt = 0;
+static int  N;                          // number of switch-rows
+static int  K;                          // switches per row
+static int  M;                          // lamps per row
+static int  L;                          // target ?on? count per lamp
 
-// Добавление неориентированного ребра u?v в список смежности:
-// 1) Добавляем ?полуребро? u -> v.
-// 2) Затем добавляем ?полуребро? v -> u.
-void add_edge(int u, int v) {
-    // Добавляем ребро u -> v
-    ecnt++;                    // увеличиваем глобальный счётчик рёбер
-    to[ecnt] = v;              // назначение этого ребра ? вершина v
-    nxt[ecnt] = head[u];       // ?следующее? ребро из u ? это предыдущее первое из u
-    head[u] = ecnt;            // теперь этим ребром начинается список смежности у
+// effect[row][switch][lamp] is 0 or 1
+static uint8_t effect[MAX_N][MAX_K][MAX_M];
+// current sum of "on" counts per lamp
+static uint8_t currentSum[MAX_M];
+// best remaining possible per lamp from row i onward
+static int     maxRemaining[MAX_N+1][MAX_M];
+// solution[row] = chosen switch index (0-based)
+static uint8_t solution[MAX_N];
 
-    // Добавляем ребро v -> u (для симметрии неориентированного графа)
-    ecnt++;
-    to[ecnt] = u;
-    nxt[ecnt] = head[v];
-    head[v] = ecnt;
-}
-
-// Вспомогательный массив queue[] служит очередью для обхода в ширину (BFS).
-int queue[MAXN + 1];
-
-int main() {
-    int n, m;
-    // Считываем из входа число вершин n и число рёбер m.
-    // Ожидаем, что вершины пронумерованы от 1 до n.
-    scanf("%d %d", &n, &m);
-
-    // Инициализируем структуру списка смежности:
-    // для каждой вершины i делаем head[i] = 0 (список пуст).
-    for (int i = 1; i <= n; i++) {
-        head[i] = 0;
-    }
-    ecnt = 0;  // сбрасываем счётчик рёбер
-
-    // Считываем m рёбер и добавляем их в список смежности.
-    // Каждая строка содержит пару u, v.
-    for (int i = 0; i < m; i++) {
-        int u, v;
-        scanf("%d %d", &u, &v);
-        add_edge(u, v);
-    }
-
-    // Переменная diameter будет хранить текущий максимум кратчайших расстояний.
-    int diameter = 0;
-
-    // Массив dist[] будет хранить расстояния от текущей начальной вершины до всех остальных.
-    // Выделяем динамически, чтобы не захламлять стек большим массивом.
-    int *dist = (int*)malloc((n + 1) * sizeof(int));
-
-    // Для каждой вершины start (от 1 до n) запускаем BFS,
-    // чтобы найти все кратчайшие расстояния от неё до остальных вершин.
-    for (int start = 1; start <= n; start++) {
-        // 1) Инициализация: помечаем все вершины как ?не посещённые? (dist = -1).
-        for (int i = 1; i <= n; i++) {
-            dist[i] = -1;
+static inline bool dfsSearch(int row)
+{
+    if (row == N)
+    {
+        for (int t = 0; t < M; t++)
+        {
+            if (currentSum[t] != L)
+            {
+                return false;
+            }
         }
-        // Расстояние до самой себя равно 0.
-        dist[start] = 0;
+        return true;
+    }
 
-        // 2) Инициализация очереди BFS.
-        int qh = 0, qt = 0;    // qh ? индекс головы очереди, qt ? хвоста
-        queue[qt++] = start;   // помещаем стартовую вершину в очередь
+    for (int sw = 0; sw < K; sw++)
+    {
+        bool ok = true;
 
-        int local_max = 0;     // локальный максимум расстояний от вершины start
+        // apply switch effect
+        for (int t = 0; t < M; t++)
+        {
+            currentSum[t] += effect[row][sw][t];
+            if (currentSum[t] > L)
+            {
+                ok = false;
+            }
+        }
 
-        // 3) Основной цикл BFS: пока очередь не пуста, достаём вершину u и обрабатываем её соседей.
-        while (qh < qt) {
-            int u = queue[qh++];         // извлекаем из очереди
-            // Проходим по всем рёбрам, исходящим из u.
-            for (int e = head[u]; e; e = nxt[e]) {
-                int v = to[e];           // получаем смежную вершину
-                if (dist[v] == -1) {     // если ещё не посещали
-                    dist[v] = dist[u] + 1;   // обновляем расстояние
-                    // Обновляем локальный максимум, если нужно.
-                    if (dist[v] > local_max) {
-                        local_max = dist[v];
-                    }
-                    queue[qt++] = v;     // добавляем v в очередь для дальнейшей обработки
+        // prune: can we still reach L on each lamp?
+        if (ok)
+        {
+            for (int t = 0; t < M; t++)
+            {
+                if (currentSum[t] + maxRemaining[row+1][t] < L)
+                {
+                    ok = false;
+                    break;
                 }
             }
         }
 
-        // 4) После завершения BFS проверяем: все ли вершины достижимы?
-        // Если нет (dist[i] == -1), значит граф несвязный ? диаметр = бесконечность ? выводим -1 и выходим.
-        for (int i = 1; i <= n; i++) {
-            if (dist[i] == -1) {
-                printf("-1\n");
-                free(dist);
-                return 0;
+        if (ok)
+        {
+            solution[row] = sw;
+            if (dfsSearch(row + 1))
+            {
+                return true;
             }
         }
 
-        // 5) Обновляем глобальный диаметр: если локальный максимум от start больше предыдущего, заменяем.
-        if (local_max > diameter) {
-            diameter = local_max;
+        // undo changes
+        for (int t = 0; t < M; t++)
+        {
+            currentSum[t] -= effect[row][sw][t];
         }
     }
 
-    // Освобождаем динамически выделенную память.
-    free(dist);
+    return false;
+}
 
-    // 6) Выводим окончательный результат ? диаметр графа.
-    printf("%d\n", diameter);
+int main(void)
+{
+    scanf("%d %d %d %d", &N, &K, &M, &L);
+
+    // portable parsing: read exactly N*K*M of 'X' or '.'
+    for (int i = 0; i < N; i++)
+    {
+        for (int j = 0; j < K; j++)
+        {
+            for (int t = 0; t < M; t++)
+            {
+                int c = getchar();
+                while (c != 'X' && c != '.')
+                {
+                    c = getchar();
+                }
+                effect[i][j][t] = (c == 'X');
+            }
+        }
+    }
+
+    // zero out current sums
+    for (int t = 0; t < M; t++)
+    {
+        currentSum[t] = 0;
+    }
+
+    // build maxRemaining[row][t]
+    for (int t = 0; t < M; t++)
+    {
+        maxRemaining[N][t] = 0;
+    }
+    for (int i = N - 1; i >= 0; i--)
+    {
+        for (int t = 0; t < M; t++)
+        {
+            int best = 0;
+            for (int j = 0; j < K; j++)
+            {
+                if (effect[i][j][t] > best)
+                {
+                    best = effect[i][j][t];
+                }
+            }
+            maxRemaining[i][t] = maxRemaining[i+1][t] + best;
+        }
+    }
+
+    if (dfsSearch(0))
+    {
+        printf("YES\n");
+        for (int i = 0; i < N; i++)
+        {
+            printf("%d\n", solution[i] + 1);
+        }
+    }
+    else
+    {
+        printf("NO");
+    }
+
     return 0;
 }

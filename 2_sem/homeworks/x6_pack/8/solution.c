@@ -1,80 +1,144 @@
 #include <stdio.h>
+#include <stdbool.h>
 
-#define MAXN 200
-#define MAXW 50000
-#define MAXC 1000000
+#define MAX_N 10
+#define MAX_K 10
+#define MAX_M 100
 
-int N, Wmax;
-int w[MAXN], c[MAXN];
-int memo[MAXN][MAXW + 1];
-int F[MAXN][MAXW + 1];
+static int  N;                          // number of switch-rows
+static int  K;                          // switches per row
+static int  M;                          // lamps per row
+static int  L;                          // target ?on? count per lamp
 
-int max(int a, int b) {
-    return (a > b) ? a : b;
-}
+// effect[row][switch][lamp] is 0 or 1
+static int effect[MAX_N][MAX_K][MAX_M];
+// current sum of "on" counts per lamp
+static int currentSum[MAX_M];
+// best remaining possible per lamp from row i onward
+static int     maxRemaining[MAX_N+1][MAX_M];
+// solution[row] = chosen switch index (0-based)
+static int solution[MAX_N];
 
-int rec(int k, int sumW) {
-    if (k == N)
-        return 0;
-    if (memo[k][sumW] != -1)
-        return memo[k][sumW];
-
-    int Cskip = rec(k + 1, sumW);
-    int Ctake = 0;
-    if (sumW + w[k] <= Wmax)
-        Ctake = rec(k + 1, sumW + w[k]) + c[k];
-
-    if (Ctake > Cskip) {
-        F[k][sumW] = 1; // take
-        memo[k][sumW] = Ctake;
-    } else {
-        F[k][sumW] = 0; // skip
-        memo[k][sumW] = Cskip;
+static bool dfsSearch(int row)
+{
+    if (row == N)
+    {
+        for (int t = 0; t < M; t++)
+        {
+            if (currentSum[t] != L)
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
-    return memo[k][sumW];
-}
+    for (int sw = 0; sw < K; sw++)
+    {
+        bool ok = true;
 
-void restore_solution() {
-    int sumW = 0;
-    for (int k = 0; k < N; k++) {
-        if (F[k][sumW] == 1) {
-            printf("%d ", k + 1);
-            sumW += w[k];
+        // apply switch effect
+        for (int t = 0; t < M; t++)
+        {
+            currentSum[t] += effect[row][sw][t];
+            if (currentSum[t] > L)
+            {
+                ok = false;
+            }
+        }
+
+        // prune: can we still reach L on each lamp?
+        if (ok)
+        {
+            for (int t = 0; t < M; t++)
+            {
+                if (currentSum[t] + maxRemaining[row+1][t] < L)
+                {
+                    ok = false;
+                    break;
+                }
+            }
+        }
+
+        if (ok)
+        {
+            solution[row] = sw;
+            if (dfsSearch(row + 1))
+            {
+                return true;
+            }
+        }
+
+        // undo changes
+        for (int t = 0; t < M; t++)
+        {
+            currentSum[t] -= effect[row][sw][t];
         }
     }
+
+    return false;
 }
 
-int main() {
-    freopen("input.txt", "r", stdin);
-    freopen("output.txt", "w", stdout);
+int main(void)
+{
+    scanf("%d %d %d %d", &N, &K, &M, &L);
 
-    scanf("%d %d", &N, &Wmax);
-
-    for (int i = 0; i < N; i++) {
-        scanf("%d %d", &w[i], &c[i]);
-    }
-
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j <= Wmax; j++) {
-            memo[i][j] = -1;
-            F[i][j] = -1;
+    // portable parsing: read exactly N*K*M of 'X' or '.'
+    for (int i = 0; i < N; i++)
+    {
+        for (int j = 0; j < K; j++)
+        {
+            for (int t = 0; t < M; t++)
+            {
+                int c = getchar();
+                while (c != 'X' && c != '.')
+                {
+                    c = getchar();
+                }
+                effect[i][j][t] = (c == 'X');
+            }
         }
     }
 
-    int optimal_cost = rec(0, 0);
+    // zero out current sums
+    for (int t = 0; t < M; t++)
+    {
+        currentSum[t] = 0;
+    }
 
-    int sumW = 0;
-    int K = 0;
-    for (int k = 0; k < N; k++) {
-        if (F[k][sumW] == 1) {
-            sumW += w[k];
-            K++;
+    // build maxRemaining[row][t]
+    for (int t = 0; t < M; t++)
+    {
+        maxRemaining[N][t] = 0;
+    }
+    for (int i = N - 1; i >= 0; i--)
+    {
+        for (int t = 0; t < M; t++)
+        {
+            int best = 0;
+            for (int j = 0; j < K; j++)
+            {
+                if (effect[i][j][t] > best)
+                {
+                    best = effect[i][j][t];
+                }
+            }
+            maxRemaining[i][t] = maxRemaining[i+1][t] + best;
         }
     }
 
-    printf("%d %d %d\n", K, sumW, optimal_cost);
-    restore_solution();
+    if (dfsSearch(0))
+    {
+        printf("YES\n");
+        for (int i = 0; i < N; i++)
+        {
+            printf("%d\n", solution[i] + 1);
+        }
+    }
+    else
+    {
+        printf("NO");
+    }
 
     return 0;
 }
