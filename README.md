@@ -1,6 +1,6 @@
 # 🖥️ Imperative Programming Assignments 🧑‍💻
 
-Hello! I’m Ковалёв В. Я. from group 24940 ИИР, and this repository contains my solutions to various **imperative programming** tasks. Buckle up and enjoy some good old-fashioned C programming!
+Hello! I’m Kovalev V. from group 24940 IIR, and this repository contains my solutions to various **imperative programming** tasks. Buckle up and enjoy some good old-fashioned C programming!
 
 ## 📂 Repository Structure
 
